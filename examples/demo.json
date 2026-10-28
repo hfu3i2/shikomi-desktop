@@ -1,0 +1,243 @@
+{
+  "format": "shikomi-backup",
+  "version": 1,
+  "createdAt": "2026-10-28T00:00:00Z",
+  "state": {
+    "settings": {
+      "maxSize": 4,
+      "portions": {
+        "5": [
+          {
+            "size": 2,
+            "count": 1
+          },
+          {
+            "size": 3,
+            "count": 1
+          }
+        ]
+      },
+      "dishes": [
+        {
+          "id": "starter",
+          "name": "前菜",
+          "portions": {},
+          "category": "前菜",
+          "calculation": {
+            "mode": "serving",
+            "quantity": 1,
+            "unit": "台"
+          }
+        },
+        {
+          "id": "pot",
+          "name": "鍋",
+          "portions": {},
+          "category": "鍋",
+          "calculation": {
+            "mode": "serving",
+            "quantity": 1,
+            "unit": "台"
+          }
+        },
+        {
+          "id": "squid",
+          "name": "いかの造り",
+          "portions": {},
+          "category": "刺身",
+          "calculation": {
+            "mode": "serving",
+            "quantity": 1,
+            "unit": "台"
+          }
+        }
+      ],
+      "courses": [
+        {
+          "id": "3500",
+          "name": "サンプルコース1",
+          "price": 3500,
+          "dishIds": [
+            "starter",
+            "pot"
+          ],
+          "recipe": {},
+          "potType": "choice"
+        },
+        {
+          "id": "4000",
+          "name": "サンプルコース2",
+          "price": 4000,
+          "dishIds": [
+            "starter",
+            "pot"
+          ],
+          "recipe": {},
+          "potType": "choice"
+        },
+        {
+          "id": "5000",
+          "name": "サンプルコース3",
+          "price": 5000,
+          "dishIds": [
+            "starter",
+            "pot"
+          ],
+          "recipe": {},
+          "potType": "choice"
+        }
+      ],
+      "rules": [
+        {
+          "id": "motsu",
+          "keyword": "もつ",
+          "source": "both",
+          "dishId": "pot",
+          "action": "pot",
+          "confirm": false
+        },
+        {
+          "id": "mizutaki",
+          "keyword": "水炊き",
+          "source": "both",
+          "dishId": "pot",
+          "action": "pot",
+          "confirm": false
+        },
+        {
+          "id": "squid-add",
+          "keyword": "いかの造り",
+          "source": "memo",
+          "dishId": "squid",
+          "action": "add",
+          "confirm": true
+        }
+      ],
+      "carteRecipe": {},
+      "potTypes": [
+        {
+          "id": "motsu",
+          "name": "もつ鍋",
+          "kind": "pot",
+          "keywords": [
+            "もつ",
+            "もつ鍋"
+          ]
+        },
+        {
+          "id": "mizutaki",
+          "name": "水炊き",
+          "kind": "pot",
+          "keywords": [
+            "水炊き",
+            "水炊"
+          ]
+        },
+        {
+          "id": "choice",
+          "name": "もつ鍋or水炊き",
+          "kind": "choice",
+          "keywords": [],
+          "choices": [
+            "motsu",
+            "mizutaki"
+          ]
+        },
+        {
+          "id": "none",
+          "name": "鍋なし",
+          "kind": "none",
+          "keywords": []
+        }
+      ],
+      "potLabels": {
+        "motsu": "もつ",
+        "mizutaki": "水",
+        "choice": "or",
+        "none": "×"
+      },
+      "tables": [
+        {
+          "number": "A1",
+          "capacity": 4
+        },
+        {
+          "number": "A2",
+          "capacity": 4
+        },
+        {
+          "number": "B1",
+          "capacity": 6
+        }
+      ],
+      "categories": [
+        "前菜",
+        "サラダ",
+        "刺身",
+        "焼き物",
+        "揚げ物",
+        "鍋",
+        "〆",
+        "デザート",
+        "その他"
+      ]
+    },
+    "manual": [
+      {
+        "id": "demo-001",
+        "date": "2026-10-28",
+        "source": "manual",
+        "name": "予約 o-001",
+        "table": "A1",
+        "time": "18:00",
+        "people": 4,
+        "courseId": "3500",
+        "courseText": "",
+        "memo": "架空のデモ予約",
+        "pot": "",
+        "overrides": {},
+        "amountOverrides": {},
+        "decisions": {}
+      }
+    ],
+    "adjustments": {},
+    "ingredients": [
+      {
+        "id": "demo-vegetable",
+        "name": "サンプル野菜",
+        "unit": "g",
+        "stock": 100,
+        "packSize": 500,
+        "buffer": 0
+      }
+    ],
+    "recipes": [
+      {
+        "dishId": "starter",
+        "ingredientId": "demo-vegetable",
+        "amount": 50,
+        "basis": "person"
+      }
+    ],
+    "sync": {
+      "autoFetch": false,
+      "autoFetchMinutes": 30,
+      "mode": "restaurantBoard",
+      "noticeWaitMinutes": 10,
+      "storeName": "",
+      "storeRowsSelector": "",
+      "storeNameSelector": "",
+      "storeCheckboxSelector": "input[type=\"checkbox\"]",
+      "notificationRowsSelector": "",
+      "notificationKeySelector": "",
+      "notificationKeyAttribute": "",
+      "notificationDownloadSelector": "",
+      "fetchDays": 30,
+      "url": "https://restaurant-board.com/CLP/view/reserveListWeb/",
+      "readySelector": "",
+      "steps": [],
+      "channel": "chrome"
+    }
+  },
+  "board": []
+}

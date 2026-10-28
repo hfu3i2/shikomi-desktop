@@ -1,0 +1,13 @@
+import {writeFileSync} from 'node:fs';
+import {initialWorkspace} from '../src/workspace.ts';
+import {blankReservation} from '../src/domain.ts';
+import {parseBackup} from '../src/backup.ts';
+const state=initialWorkspace();
+state.settings.courses.forEach((c,i)=>{c.name=`サンプルコース${i+1}`;});
+state.sync.autoFetch=false;
+state.ingredients=[{id:'demo-vegetable',name:'サンプル野菜',unit:'g',stock:100,packSize:500,buffer:0}];
+state.recipes=[{dishId:'starter',ingredientId:'demo-vegetable',amount:50,basis:'person'}];
+state.manual=[{...blankReservation(state.settings),id:'demo-001',name:'デモ予約',date:'2026-10-28',source:'manual',table:'A1',people:4,memo:'架空のデモ予約'}];
+const backup=parseBackup({format:'shikomi-backup',version:1,createdAt:'2026-10-28T00:00:00Z',state,board:[]});
+writeFileSync(new URL('./demo.json',import.meta.url),JSON.stringify(backup,null,2)+'\n');
+console.log('Validated fictional demo data: examples/demo.json');

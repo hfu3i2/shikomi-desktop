@@ -1,0 +1,35 @@
+import assert from 'node:assert/strict';
+import {createServer} from 'node:http';
+import {readFile} from 'node:fs/promises';
+import {resolve,sep,dirname} from 'node:path';
+import {fileURLToPath} from 'node:url';
+import {createRequire} from 'node:module';
+import {initialWorkspace,cleanReservation,localDate} from '../src/workspace.ts';
+import {blankReservation} from '../src/domain.ts';
+import {launchBoardBrowser} from '../worker/browser.mjs';
+const root=resolve(dirname(fileURLToPath(import.meta.url)),'..'),dist=resolve(root,'dist');
+const {chromium}=createRequire(resolve(root,'worker/package.json'))('playwright');
+const server=createServer(async(req,res)=>{try{const url=new URL(req.url,'http://localhost');const p=resolve(dist,'.'+(url.pathname==='/'?'/index.html':decodeURIComponent(url.pathname)));if(!p.startsWith(dist+sep))throw Error('outside');res.setHeader('Content-Type',p.endsWith('.js')?'text/javascript':p.endsWith('.css')?'text/css':'text/html');res.end(await readFile(p));}catch{res.statusCode=404;res.end('Not found');}});
+await new Promise(r=>server.listen(0,'127.0.0.1',r));let browser;
+try{browser=await launchBoardBrowser(chromium,{channel:'chrome'},false);
+ const page=await browser.newPage({viewport:{width:900,height:650}}),state=initialWorkspace();
+ state.settings.dishes.push({id:'fried',name:'唐揚げ',category:'揚げ物',portions:{},calculation:{mode:'perPerson',quantity:2,unit:'個'}});state.settings.courses[1].dishIds.push('fried');
+ state.manual=[cleanReservation({...blankReservation(state.settings),id:'course',courseId:'4000',time:'18:00',people:3,memo:'もつ鍋'},localDate()),cleanReservation({...blankReservation(state.settings),id:'carte1',kind:'carte',courseId:'__carte__',time:'19:00',people:2},localDate()),cleanReservation({...blankReservation(state.settings),id:'carte2',kind:'carte',courseId:'__carte__',time:'19:30',people:2},localDate())];
+ await page.addInitScript(s=>{if(!localStorage.getItem('portfolio.shikomi.workspace.v1'))localStorage.setItem('portfolio.shikomi.workspace.v1',JSON.stringify(s));},state);
+ await page.goto('http://127.0.0.1:'+server.address().port);
+ await page.getByRole('button',{name:'コース・料理の設定',exact:true}).click();await page.getByRole('button',{name:'カルト仕込み',exact:true}).click();
+ await page.getByLabel('唐揚げをカルト仕込みに追加',{exact:true}).check();await page.getByLabel('唐揚げの段階1の人数',{exact:true}).fill('5');await page.getByLabel('唐揚げの段階1の条件',{exact:true}).selectOption('lt');await page.getByLabel('唐揚げの段階1の量',{exact:true}).fill('3');
+ await page.getByRole('button',{name:'唐揚げの人数段階を追加',exact:true}).click();await page.getByLabel('唐揚げの段階2の人数',{exact:true}).fill('8');await page.getByLabel('唐揚げの段階2の条件',{exact:true}).selectOption('lte');await page.getByLabel('唐揚げの段階2の量',{exact:true}).fill('5');
+ for(const [people,quantity] of [[0,0],[4,3],[5,5],[8,5],[9,0]]){await page.getByLabel('カルト仕込みの表示例人数',{exact:true}).fill(String(people));assert.match(await page.locator('.carte-dish-list').innerText(),new RegExp('＋'+quantity+'個'));}
+ await page.getByLabel('唐揚げの段階2の量',{exact:true}).scrollIntoViewIfNeeded();await page.screenshot({path:resolve(root,'carte-bounds-v29.png')});
+ await page.getByRole('button',{name:'保存',exact:true}).click();await page.waitForFunction(()=>JSON.parse(localStorage.getItem('portfolio.shikomi.workspace.v1')).settings.carteRecipe?.fried?.tiers?.length===2);
+ await page.reload();await page.getByRole('button',{name:'コース・料理の設定',exact:true}).click();await page.getByRole('button',{name:'カルト仕込み',exact:true}).click();assert.equal(await page.getByLabel('唐揚げの段階2の量',{exact:true}).inputValue(),'5');await page.getByRole('button',{name:'設定を閉じる',exact:true}).click();
+ await page.getByRole('button',{name:'仕込み表',exact:true}).click();await page.locator('.reservation-item').filter({hasText:'19:30'}).click();assert.match(await page.locator('.detail-inner').innerText(),/カルト合計 4名/);
+ await page.getByRole('button',{name:'卓・台数を確認',exact:true}).click();await page.getByRole('button',{name:'印刷へ',exact:true}).click();
+ const item=page.locator('.legacy-prep-item').filter({has:page.getByRole('heading',{name:/唐揚げ/})});assert.match(await item.innerText(),/カルト分：3個/);assert.match(await item.innerText(),/合計 9個/);assert.match(await page.locator('.legacy-carte-corner').innerText(),/4名/);
+ await page.getByRole('button',{name:'戻る',exact:true}).click();await page.getByRole('button',{name:'戻る',exact:true}).click();await page.getByLabel('人数',{exact:true}).fill('3');
+ await page.getByRole('button',{name:'卓・台数を確認',exact:true}).click();await page.getByRole('button',{name:'印刷へ',exact:true}).click();assert.match(await item.innerText(),/カルト分：5個/);assert.match(await item.innerText(),/合計 11個/);assert.match(await item.innerText(),/8名以下/);
+ for(const media of ['screen','print']){await page.emulateMedia({media});const overflow=await page.locator('.legacy-sheet').evaluate(el=>[el,...el.querySelectorAll('.measure-box')].some(x=>x.scrollWidth>x.clientWidth+1||x.scrollHeight>x.clientHeight+1));assert.equal(overflow,false);}await page.emulateMedia({media:'screen'});
+ await page.getByRole('button',{name:'コース・料理の設定',exact:true}).click();await page.getByRole('button',{name:'カルト仕込み',exact:true}).click();await page.getByLabel('唐揚げをカルト仕込みに追加',{exact:true}).uncheck();await page.getByRole('button',{name:'保存',exact:true}).click();assert.match(await item.innerText(),/合計 6個/);assert.doesNotMatch(await item.innerText(),/カルト分/);
+ console.log('Carte <5=>3 and <=8=>5, 0/4/5/8/9 preview boundaries, save/reload, combined bookings, print conditions and course sum passed');await page.close();
+}finally{await browser?.close();await new Promise(r=>server.close(r));}

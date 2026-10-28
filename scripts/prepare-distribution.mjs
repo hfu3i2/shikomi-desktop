@@ -1,0 +1,10 @@
+import {copyFile,mkdir,access} from 'node:fs/promises';
+import {fileURLToPath} from 'node:url';
+import {join} from 'node:path';
+const root=fileURLToPath(new URL('../',import.meta.url));
+if(process.platform!=='win32'||process.arch!=='x64'||process.version!=='v24.15.0')throw Error('This release bundles Node.js v24.15.0 for Windows x64. Use that version or update its pinned version and license together.');
+await access(join(root,'worker/node_modules/playwright/index.mjs'));
+await mkdir(join(root,'src-tauri/runtime'),{recursive:true});
+await copyFile(process.execPath,join(root,'src-tauri/runtime/node.exe'));
+await copyFile(join(root,'licenses/NODE-LICENSE.txt'),join(root,'src-tauri/runtime/NODE-LICENSE.txt'));
+console.log('Distribution runtime prepared: Node.js '+process.version);

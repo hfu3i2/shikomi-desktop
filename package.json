@@ -1,0 +1,31 @@
+{
+  "name": "shikomi-desktop",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1 --port 5173 --strictPort",
+    "build": "tsc --noEmit && vite build",
+    "test": "node --experimental-strip-types --test src/cartePrep.test.ts src/pots.test.ts src/autoFetch.test.ts src/domain.test.ts src/csv.test.ts src/printModel.test.ts src/printLayout.test.ts src/workspace.test.ts worker/lib.test.mjs worker/flow.test.mjs worker/restaurant-board.test.mjs worker/manual-only.test.mjs src/genres.test.ts src/tables.test.ts src/servingReview.test.ts src/backup.test.ts src/calendarModel.test.ts worker/browser.test.mjs worker/startup.test.mjs",
+    "tauri": "tauri",
+    "prepare:distribution": "node scripts/prepare-distribution.mjs",
+    "test:print": "node --experimental-strip-types scripts/check-print-layout.mjs"
+  },
+  "dependencies": {
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "lucide-react": "^0.468.0",
+    "papaparse": "^5.5.3",
+    "@tauri-apps/api": "^2.0.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3",
+    "vite": "^7.1.0",
+    "@vitejs/plugin-react": "^5.0.0",
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
+    "@types/papaparse": "^5.3.16",
+    "@types/node": "^24.0.0",
+    "@tauri-apps/cli": "^2.0.0"
+  }
+}

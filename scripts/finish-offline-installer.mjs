@@ -1,0 +1,18 @@
+import {readFileSync, existsSync, copyFileSync, statSync} from 'node:fs';
+import {spawnSync} from 'node:child_process';
+import {fileURLToPath} from 'node:url';
+import path from 'node:path';
+const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+const cwd = path.join(root, 'src-tauri/target/release/nsis/x64');
+const script = readFileSync(path.join(cwd, 'installer.nsi'), 'utf8');
+if (!script.includes('!define INSTALLWEBVIEW2MODE "offlineInstaller"')) throw Error('Offline installer configuration is missing.');
+const runtime = script.match(/^!define WEBVIEW2INSTALLERPATH "([^"]+)"/m)?.[1];
+if (!runtime || !existsSync(runtime) || statSync(runtime).size < 50000000) throw Error('WebView2 offline installer is missing.');
+console.log('Building installer with WebView2. This can take several minutes.');
+const result = spawnSync(path.join(root, 'src-tauri/target/.tauri/NSIS/makensis.exe'), ['-INPUTCHARSET', 'UTF8', '-OUTPUTCHARSET', 'UTF8', '-V3', 'installer.nsi'], {cwd, stdio:'inherit', windowsHide:true});
+if (result.error) throw result.error;
+if (result.status !== 0) process.exit(result.status || 1);
+const output = path.join(root, 'deliverables/ShikomiSetup-v18.exe');
+copyFileSync(path.join(cwd, 'nsis-output.exe'), output);
+console.log('\nCreated: ' + output);
+console.log('Test this installer in a fresh Windows Sandbox.');

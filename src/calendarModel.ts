@@ -1,0 +1,2 @@
+export function calendarDays(month:string){const [year,m]=month.split('-').map(Number);const start=new Date(year,m-1,1).getDay();const count=new Date(year,m,0).getDate();return {start,days:Array.from({length:count},(_,i)=>`${month}-${String(i+1).padStart(2,'0')}`)};}
+export function reservationCounts(rows:{date:string;people:number}[]){const result:Record<string,{people:number;groups:number}>={};for(const r of rows){const item=result[r.date]??={people:0,groups:0};item.people+=r.people;item.groups++;}return result;}

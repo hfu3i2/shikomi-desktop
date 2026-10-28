@@ -1,0 +1,30 @@
+/* The preview and printed page use identical dimensions and typography. */
+.category-field{display:flex;flex-direction:column;gap:5px;font-size:11px;color:#747b87;margin:12px 0}.category-field input{max-width:260px}
+.print-controls{flex-wrap:wrap}.print-controls label{display:flex;gap:5px;align-items:center}.print-controls input{border:1px solid #d8dce4;border-radius:6px;padding:7px;background:#fff;font-size:12px;min-width:0}.print-controls input:not([type=date]){width:110px}
+.legacy-paper{width:290mm;height:203mm;background:#fff;box-shadow:0 2px 13px #1a23361a;flex-shrink:0;color:#111}
+.legacy-sheet{width:100%;height:100%;border:1px solid #222;display:flex;flex-direction:column;overflow:hidden;line-height:1.25;font-family:"Yu Gothic","Meiryo",sans-serif;overflow-wrap:normal}
+.legacy-sheet-header{display:flex;align-items:center;justify-content:space-between;gap:.6em;padding:.15em .4em;border-bottom:1px solid #222;flex-shrink:0;min-height:1.8em}
+.legacy-sheet-header h2{font-size:1.2em;line-height:1.1;margin:0;font-weight:700;white-space:nowrap;letter-spacing:.03em}
+.legacy-sheet-header>div{display:flex;gap:1.5em;font-size:.8em;align-items:center}
+.legacy-course-grid{display:grid;flex-shrink:0;min-height:0}
+.legacy-course{min-width:0;border-right:1px solid #222;display:flex;flex-direction:column}.legacy-course:last-child{border-right:0}
+.legacy-course h3{font-size:.95em;background:#f3f3f3;border-bottom:1px solid #222;text-align:center;margin:0;padding:.16em .2em;font-weight:700;line-height:1.15}
+.legacy-course-body{padding:.15em .35em;flex:1;min-height:0;display:flex;flex-wrap:wrap;gap:.12em .5em;align-content:start}
+.legacy-reservation-line{display:flex;align-items:baseline;gap:.15em;line-height:1.15;margin:0;flex-wrap:nowrap;flex-shrink:0;white-space:nowrap;font-size:.95em;max-width:100%}
+.legacy-reservation-line b{font-size:1.23em}.legacy-reservation-line span{font-size:.9em}.legacy-reservation-line strong{font-size:.95em}
+.legacy-position-grid{display:block;position:relative;border-top:1px solid #222;flex:1;min-height:0}
+.legacy-position{position:absolute;width:33.333333%;min-width:0;border-right:1px solid #222;border-bottom:1px solid #222;height:auto}
+.legacy-position h3{font-size:.95em;line-height:1.15;border-bottom:1px solid #222;background:#ededed;text-align:center;margin:0;padding:.12em .25em}
+.legacy-position-items{display:block;column-count:2;column-gap:0;column-rule:1px solid #ccc;column-fill:balance;min-width:0}
+.legacy-prep-item{display:flow-root;break-inside:avoid;page-break-inside:avoid;min-width:0;padding:.16em .28em;border-bottom:1px solid #ccc}
+.legacy-prep-item h4{font-size:1em;font-weight:700;margin:0 0 .1em;line-height:1.15}
+.legacy-prep-detail{font-size:.88em;line-height:1.15}.legacy-prep-total{font-size:.9em;font-weight:700;text-align:right;margin-top:.12em;line-height:1.15}
+.legacy-no-data{font-size:.8em;color:#666;padding:1em;grid-column:1/-1}
+.legacy-carte-corner{flex-shrink:0;font-size:.65em;line-height:1.25;text-align:right;padding:.3em .6em;color:#444}
+@media print{.legacy-paper{width:290mm!important;height:203mm!important;box-shadow:none!important;margin:0!important;padding:0!important;break-inside:avoid}.legacy-sheet{print-color-adjust:exact;-webkit-print-color-adjust:exact}.legacy-sheet h3{print-color-adjust:exact;-webkit-print-color-adjust:exact}}
+
+/* Keep each printed name, quantity and reservation together. The fit pass
+   measures horizontal overflow before selecting columns and font size. */
+.legacy-course h3,.legacy-position h3,.legacy-prep-item h4,.legacy-prep-detail,.legacy-prep-total{white-space:nowrap;overflow-wrap:normal;word-break:normal}
+.legacy-sheet-header>div>span{white-space:nowrap}
+.legacy-reservation-line>*{flex-shrink:0}

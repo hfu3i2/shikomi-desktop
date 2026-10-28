@@ -1,0 +1,49 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "仕込み管理デモ",
+  "version": "0.2.1",
+  "identifier": "dev.portfolio.shikomi.demo",
+  "build": {
+    "beforeDevCommand": "npm run dev",
+    "devUrl": "http://localhost:5173",
+    "beforeBuildCommand": "npm run build",
+    "frontendDist": "../dist"
+  },
+  "app": {
+    "windows": [
+      {
+        "title": "仕込み管理デモ",
+        "width": 1360,
+        "height": 920,
+        "minWidth": 900,
+        "minHeight": 650
+      }
+    ],
+    "security": {
+      "csp": "default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src ipc: http://ipc.localhost"
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": [
+      "nsis"
+    ],
+    "resources": {
+      "../worker/": "worker/",
+      "runtime/": "runtime/"
+    },
+    "windows": {
+      "webviewInstallMode": {
+        "type": "offlineInstaller"
+      },
+      "nsis": {
+        "installMode": "currentUser",
+        "languages": [
+          "Japanese"
+        ],
+        "compression": "lzma"
+      }
+    },
+    "useLocalToolsDir": true
+  }
+}

@@ -1,0 +1,34 @@
+import {useEffect,useLayoutEffect,useMemo,useRef,useState} from 'react';
+import {AlertCircle,Printer} from 'lucide-react';
+import {settingsPotTypes,potLabel,formatAmount,type Settings,type Reservation} from './domain';
+import {buildPrintModel} from './printModel';
+import {packPrintColumns,largestPrintFont} from './printLayout';
+import './print.css';
+const today=()=>{const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;};
+export default function PrintView({reservations,settings,font,setFont,unresolved,initialDate}:{reservations:Reservation[];settings:Settings;font:string;setFont:(v:string)=>void;unresolved:number;initialDate?:string}){
+ const model=useMemo(()=>buildPrintModel(reservations,settings),[reservations,settings]);
+ const sheet=useRef<HTMLDivElement>(null),[size,setSize]=useState(16),[fits,setFits]=useState(true),[printing,setPrinting]=useState(false),[date,setDate]=useState(initialDate??today),[person,setPerson]=useState('');
+ useLayoutEffect(()=>{let cancelled=false;
+  const fit=()=>{if(cancelled||!sheet.current)return;const el=sheet.current;
+   const arrange=()=>{const grid=el.querySelector<HTMLElement>('.legacy-position-grid');if(!grid)return;const sections=[...grid.querySelectorAll<HTMLElement>('.legacy-position')];const columns=Math.max(1,Math.min(3,sections.length));
+    // Measure natural heights after fixing column width; choose the denser item layout.
+    const heights=sections.map(section=>{section.style.width=`${100/columns}%`;section.style.left='0';section.style.top='0';const items=section.querySelector<HTMLElement>('.legacy-position-items')!;items.style.columnCount='1';const one=section.getBoundingClientRect().height;items.style.columnCount='2';const two=section.getBoundingClientRect().height;const twoFits=[...items.querySelectorAll<HTMLElement>('.legacy-prep-item')].every(item=>item.scrollWidth<=item.clientWidth+1);items.style.columnCount=!twoFits||one<two||items.children.length<=1?'1':'2';return Math.ceil(section.getBoundingClientRect().height);});
+    const packed=packPrintColumns(heights,columns);sections.forEach((section,i)=>{section.style.left=`${packed.placements[i].column*100/columns}%`;section.style.top=`${packed.placements[i].top}px`;});
+   };
+   const measure=(n:number)=>{el.style.fontSize=`${n}px`;arrange();return ![el,...el.querySelectorAll<HTMLElement>('.measure-box')].some(box=>box.scrollHeight>box.clientHeight+1||box.scrollWidth>box.clientWidth+1);};
+   const n=font==='auto'?largestPrintFont(measure):Number(font);const fitResult=measure(n);setSize(n);setFits(fitResult);
+  };fit();void document.fonts.ready.then(fit);return()=>{cancelled=true;};},[model,font,date,person]);
+ useEffect(()=>{const done=()=>setPrinting(false);window.addEventListener('afterprint',done);return()=>window.removeEventListener('afterprint',done);},[]);
+ const print=async()=>{if(!fits)return;setPrinting(true);try{await document.fonts.ready;if('__TAURI_INTERNALS__'in window){const{invoke}=await import('@tauri-apps/api/core');await invoke('print_page');}else window.print();}catch{alert('印刷できませんでした。プリンターの設定を確認してください。');}finally{setPrinting(false);}};
+ const dateLabel=date?new Date(`${date}T12:00:00`).toLocaleDateString('ja-JP',{year:'numeric',month:'long',day:'numeric',weekday:'short'}):'';
+ return <div className="print-workspace"><div className="print-controls"><div><h2>印刷プレビュー</h2><p>コース別の人数・盛り分けと、ポジション別の必要仕込み量</p></div><label>日付<input type="date" value={date} onChange={e=>setDate(e.target.value)}/></label><label>担当<input value={person} placeholder="空欄でも印刷可" onChange={e=>setPerson(e.target.value)}/></label><label>文字<select value={font} onChange={e=>setFont(e.target.value)}><option value="auto">自動</option>{[10,12,14,16,18,20,22,24,26,28].map(n=><option key={n} value={n}>{n}px</option>)}</select></label><button className="primary" disabled={!reservations.length||printing||!fits} onClick={()=>void print()}><Printer size={17}/>{printing?'印刷中…':'印刷する'}</button></div>
+ {unresolved>0&&<p className="print-warning"><AlertCircle size={16}/>要確認の予約が{unresolved}件あります。未定の鍋は「{potLabel(settings,'choice')}」として表示します。</p>}
+ {!fits&&<p className="print-warning" role="alert">内容が1ページに収まりません。文字サイズを「自動」にするか、設定・予約内容を確認してください。内容が欠ける状態では印刷しません。</p>}
+ {fits&&size<9&&<p className="print-warning">文字が小さくなっています（{size}px）。プレビューで読みやすさを確認してください。</p>}
+ <div className="paper-scroll"><div className="legacy-paper"><div ref={sheet} className="legacy-sheet measure-box" style={{fontSize:size}}>
+ <header className="legacy-sheet-header measure-box"><h2>仕込み表</h2><div><span>{dateLabel}</span><span>担当：{person||'＿＿＿＿＿＿'}</span></div></header>
+ <section className="legacy-course-grid measure-box" style={{gridTemplateColumns:`repeat(${Math.max(model.courseGroups.length,1)},minmax(0,1fr))`}}>{model.courseGroups.map(c=><section className="legacy-course" key={c.key}><h3>{c.label}（{c.people}）名</h3><div className="legacy-course-body measure-box">{c.reservations.map(r=><div className="legacy-reservation-line" key={r.id}><b>{r.people}</b><span>（{r.servings.map(p=>`${p.size}×${p.count}`).join('・')}）</span><strong>{r.mark}</strong></div>)}</div></section>)}{!model.courseGroups.length&&<p className="legacy-no-data">コースが登録されていません</p>}</section>
+ <section className="legacy-position-grid measure-box" style={{gridTemplateColumns:'repeat(3,minmax(0,1fr))'}}>{model.categories.map(category=><section className="legacy-position measure-box" key={category.name}><h3>{category.name}</h3><div className="legacy-position-items measure-box">{category.items.map(item=><article className="legacy-prep-item measure-box" key={item.key}><h4>○ {item.name}</h4>{item.mode==='serving'?Object.entries(item.servings).sort((a,b)=>+b[0]-+a[0]).map(([people,count])=><div className="legacy-prep-detail" key={people}>{people}名分 × {formatAmount(count)}{item.unit}</div>):item.details.map((detail,i)=><div className="legacy-prep-detail" key={i}><b>{detail.courseLabels.length?`[${[...detail.courseLabels].sort((a,b)=>a.localeCompare(b,'ja',{numeric:true})).join('・')}] `:''}</b>{detail.manual?'手動調整あり':`1人分：${formatAmount(detail.quantity)}${item.unit}`}</div>)}{item.carteTotal>0&&<div className="legacy-prep-detail">カルト分：{formatAmount(item.carteTotal)}{item.unit}（{item.carteCondition}）</div>}<div className="legacy-prep-total">合計 {formatAmount(item.total)}{item.unit}</div></article>)}</div></section>)}{!model.categories.length&&model.cartePeople===0&&<p className="legacy-no-data">必要仕込みはありません。コースの料理設定を確認してください。</p>}</section>
+ {model.cartePeople>0&&<div className="legacy-carte-corner measure-box">カルト：{model.cartePeople}名</div>}
+ </div></div></div><p className="helper">A4横・1ページ ／ 自動文字サイズ：{size}px ／ {reservations.length}組・{model.totalPeople}名　　{settingsPotTypes(settings).map(t=>`${potLabel(settings,t.id)}：${t.name}`).join('　')}</p></div>;
+}

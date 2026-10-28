@@ -1,0 +1,90 @@
+/* Application chrome only: printed prep tables retain their dense layout. */
+@media screen{
+:root{--accent:#007aff;--ink:#1d1d1f;--secondary:#6e6e73;--line:rgba(60,60,67,.12)}
+body{color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Yu Gothic UI',sans-serif}
+.desktop{background:#f5f5f7;color:var(--ink)}
+.desktop button,.modal-backdrop button{border-radius:11px;border:1px solid rgba(60,60,67,.12);background:#fff;color:#353539;font-weight:500;min-height:34px;padding:8px 13px;box-shadow:0 1px 2px #00000005;transition:background .15s,box-shadow .15s,transform .12s;cursor:pointer}
+.desktop button:hover:not(:disabled),.modal-backdrop button:hover:not(:disabled){background:#f1f1f4;box-shadow:0 2px 6px #00000008}
+.desktop button:active:not(:disabled),.modal-backdrop button:active:not(:disabled){transform:scale(.98);background:#e9e9ed}
+.desktop button:disabled,.modal-backdrop button:disabled{opacity:.4;cursor:default;box-shadow:none}
+.desktop button.primary,.modal-backdrop button.primary{background:var(--accent);border-color:transparent;color:white;box-shadow:0 2px 5px #007aff20}
+.desktop button.primary:hover:not(:disabled),.modal-backdrop button.primary:hover:not(:disabled){background:#006ee6}
+.desktop button:focus-visible,.modal-backdrop button:focus-visible,.desktop input:focus-visible,.desktop select:focus-visible,.modal-backdrop input:focus-visible{outline:3px solid #007aff45;outline-offset:2px}
+.desktop .dashboard-nav{width:205px;background:linear-gradient(160deg,#efeff3f5,#e9e9eef5);border-right:1px solid #d9d9df;padding:28px 13px;gap:5px}
+.desktop .dashboard-nav h2{letter-spacing:-.7px;font-size:23px;margin:0 13px 5px}
+.desktop .dashboard-nav>small{font-size:9px;color:#939399;margin-bottom:25px}
+.desktop .dashboard-nav button{background:transparent;border:0;box-shadow:none;border-radius:9px;padding:11px 14px;color:#515159;font-size:13px}
+.desktop .dashboard-nav button.active{background:#007aff;color:#fff;box-shadow:0 2px 5px #007aff1a}
+.desktop .dashboard-nav button.active:hover{background:#0072ed}
+.desktop .dashboard-header{background:#fafafcdd;backdrop-filter:blur(24px);border-bottom:1px solid var(--line);height:86px;position:relative;z-index:20}
+.desktop .dashboard-header h1{font-size:24px;letter-spacing:-.7px;font-weight:650}
+.desktop .dashboard-header small{font-size:9px;letter-spacing:1.6px;color:#929298}
+.desktop .metric-grid article,.desktop .dashboard-card,.desktop .serving-review-card{border:1px solid #0000000b;border-radius:19px;box-shadow:0 4px 18px #20203004;background:#fff}
+.desktop .metric-grid strong{font-weight:600;letter-spacing:-1.5px}
+.desktop .dashboard-card h2{font-weight:600;letter-spacing:-.35px}
+.desktop input,.desktop select,.desktop textarea,.modal-backdrop input,.modal-backdrop select,.modal-backdrop textarea{border:1px solid #00000016;border-radius:10px;background:#fff;padding:9px 11px;color:var(--ink);box-shadow:0 1px 2px #00000003}
+.desktop .toolbar{background:#fafafc;border-bottom:1px solid var(--line)}
+.desktop .reservation-list{background:#f9f9fb;border-right:1px solid var(--line)}
+.desktop button.reservation-item{border:0;box-shadow:none;background:transparent;border-radius:11px;text-align:left}
+.desktop button.reservation-item.active{background:#e4efff;color:#0068d7}
+.desktop .reservation-scroll{padding:4px 8px}
+.desktop .footer{background:#fafafc;border-top:1px solid var(--line)}
+.desktop .segmented,.modal-backdrop .segmented,.modal-backdrop .settings-tabs{background:#ededf1;border-radius:11px;padding:3px;gap:3px}
+.desktop .segmented button,.modal-backdrop .segmented button,.modal-backdrop .settings-tabs button{border:0;background:transparent;box-shadow:none;border-radius:8px;color:#6e6e73}
+.desktop .segmented button.chosen,.modal-backdrop .segmented button.chosen,.modal-backdrop .settings-tabs button.chosen{background:#fff;color:#1d1d1f;box-shadow:0 2px 5px #00000012}
+.modal-backdrop{background:#14142045;backdrop-filter:blur(5px)}
+.modal-backdrop .dialog{border-radius:21px;border:1px solid #ffffff80;box-shadow:0 25px 80px #15152530}
+.desktop .text-button,.modal-backdrop .text-button{border:0;background:transparent;color:var(--accent);box-shadow:none}
+.desktop .calendar-grid>button{border-radius:14px}
+.desktop .calendar-grid>button.active{background:#eaf3ff;border-color:#007aff;color:#0065d5}
+.desktop .date-picker{position:relative}
+.desktop .date-trigger{display:flex;align-items:center;gap:10px;background:white;border-radius:12px;min-height:39px;font-variant-numeric:tabular-nums;padding:9px 13px;box-shadow:0 2px 6px #00000004}
+.date-trigger>svg:first-child{color:#007aff}.date-trigger>svg:last-child{color:#8e8e93}
+.date-popover{position:absolute;right:0;top:calc(100% + 12px);width:350px;max-width:calc(100vw - 24px);padding:18px;background:#fffffff5;backdrop-filter:blur(30px);border:1px solid #0000000d;border-radius:21px;box-shadow:0 18px 65px #20203026;z-index:100}
+.date-month{display:flex;align-items:center;justify-content:space-between;margin-bottom:15px}.date-month>strong{font-size:16px;letter-spacing:-.3px}.date-month>div{display:flex;gap:3px}
+.desktop .date-month .icon-button{padding:6px;min-height:28px;width:29px;border:0;box-shadow:none;background:transparent;color:#007aff;border-radius:50%}
+.date-weekdays,.date-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px}.date-weekdays span{text-align:center;font-size:10px;color:#8e8e93;padding-bottom:8px}
+.desktop .date-grid button{height:65px;min-width:0;padding:5px 0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:3px;border:0;box-shadow:none;background:transparent;border-radius:12px}
+.date-grid b{font-size:13px;font-weight:500}.date-grid small{font-size:10px;color:#6e6e73}.date-grid em{font-size:9px;font-style:normal;color:#a0a0a8}.date-grid .today b{color:#007aff;font-weight:700}
+.desktop .date-grid button.selected{background:#007aff;box-shadow:0 3px 8px #007aff24;color:#fff}.date-grid .selected small,.date-grid .selected em,.date-grid .selected b{color:#fff}
+.date-popover>footer{display:flex;align-items:center;justify-content:space-between;border-top:1px solid #0000000a;margin-top:12px;padding-top:9px;font-size:10px;color:#8e8e93}
+@media(max-height:760px){.date-grid button{height:48px!important}.date-popover{padding:13px}.date-month{margin-bottom:8px}}
+@media(prefers-reduced-motion:reduce){.desktop button,.modal-backdrop button{transition:none}}
+}
+
+/* Fit the month to the available window height, including six-week months. */
+.dashboard-main{min-height:0}
+.dashboard-content.calendar-content{min-height:0;display:flex;flex-direction:column;overflow:hidden;padding:clamp(12px,2vh,24px) clamp(16px,2vw,32px)}
+.calendar-content .month-controls{flex-shrink:0;margin-bottom:12px;gap:12px}
+.calendar-content .month-controls h2{margin:0;font-size:20px}
+.calendar-content .calendar-grid{flex:1;min-height:0;grid-template-columns:repeat(7,minmax(0,1fr));gap:clamp(4px,1vh,8px)}
+.calendar-content .calendar-grid>b{padding:4px}
+.desktop .calendar-content .calendar-grid>button{height:auto;min-height:0;min-width:0;padding:clamp(5px,1.2vh,14px);overflow:hidden}
+.calendar-content .calendar-grid>button span{font-size:clamp(10px,1vw,12px);white-space:nowrap}
+.workflow-steps{display:flex;gap:8px;padding:10px 24px;border-bottom:1px solid var(--line);background:#fafafc;flex-shrink:0}
+.desktop .workflow-steps button{display:flex;align-items:center;gap:7px;border:0;background:transparent;box-shadow:none;font-size:12px}
+.workflow-steps button>span{display:grid;place-items:center;width:22px;height:22px;border-radius:50%;background:#e8e8ed}
+.desktop .workflow-steps button.active{background:#e4efff;color:#0068d7}
+.workflow-steps button.active>span{background:#007aff;color:white}
+.workflow-steps small{font-size:11px;color:#a46b00}
+@media print{.workflow-steps{display:none!important}}
+
+.modal-backdrop .settings-tabs{flex-wrap:wrap}
+.pot-config .input-grid{margin:0 0 12px}
+.pot-keywords{display:flex;flex-direction:column;gap:8px;font-size:13px}
+.pot-preview{font-size:13px;color:#6e6e73;margin:8px 0 16px}.pot-preview strong{color:#202124;font-size:17px}
+.pot-choices{display:flex;flex-wrap:wrap;gap:12px 20px}.pot-choices label{display:flex;align-items:center;gap:7px;font-size:13px}
+
+.course-dish-list-heading{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:14px 0 8px;font-size:12px;color:#515159}
+.course-dish-list-heading small{font-size:11px;color:#86868b}
+.course-dish-list{max-height:clamp(160px,34vh,320px);overflow-y:auto;overscroll-behavior-y:contain;scrollbar-gutter:stable;border:1px solid #e5e5ea;border-radius:10px;padding:0 12px;background:#fafafc}
+.course-dish-list:focus-visible{outline:3px solid #007aff45;outline-offset:2px}
+.course-dish-list .course-dish-config:first-child{border-top:0}
+
+.course-variants-toggle{display:flex;align-items:center;gap:8px;font-size:12px;margin:14px 0}
+.course-variant-tabs{display:flex;width:fit-content;margin:10px 0 14px}.course-variant-tabs button{min-width:90px}
+
+.carte-unit{display:flex;align-items:center;gap:10px;font-size:12px;margin:14px 0}.carte-unit input{width:100px}
+.carte-tier{display:flex;align-items:end;gap:9px;margin:10px 0;font-size:12px}.carte-tier label{display:flex;flex-direction:column;gap:5px;min-width:0;flex:1}.carte-tier input{width:100%;min-width:0}.carte-tier>span{padding-bottom:10px;white-space:nowrap}
+
+.carte-tier select{width:100%;min-width:0}

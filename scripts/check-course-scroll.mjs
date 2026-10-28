@@ -1,0 +1,40 @@
+import assert from 'node:assert/strict';
+import {createServer} from 'node:http';
+import {readFile} from 'node:fs/promises';
+import {resolve,sep,dirname} from 'node:path';
+import {fileURLToPath} from 'node:url';
+import {createRequire} from 'node:module';
+import {initialWorkspace,cleanReservation,localDate} from '../src/workspace.ts';
+import {blankReservation} from '../src/domain.ts';
+import {launchBoardBrowser} from '../worker/browser.mjs';
+const root=resolve(dirname(fileURLToPath(import.meta.url)),'..'),dist=resolve(root,'dist');
+const {chromium}=createRequire(resolve(root,'worker/package.json'))('playwright');
+const server=createServer(async(req,res)=>{try{const url=new URL(req.url,'http://localhost');const p=resolve(dist,'.'+(url.pathname==='/'?'/index.html':decodeURIComponent(url.pathname)));if(!p.startsWith(dist+sep))throw Error('outside');res.setHeader('Content-Type',p.endsWith('.js')?'text/javascript':p.endsWith('.css')?'text/css':'text/html');res.end(await readFile(p));}catch{res.statusCode=404;res.end('Not found');}});
+await new Promise(r=>server.listen(0,'127.0.0.1',r));let browser;
+try{browser=await launchBoardBrowser(chromium,{channel:'chrome'},false);
+ const state=initialWorkspace();
+ for(let i=1;i<=60;i++)state.settings.dishes.push({id:'scroll-'+i,name:'検証料理'+i,category:'その他',portions:{},calculation:{mode:'perPerson',quantity:1,unit:'個'}});
+ const page=await browser.newPage({viewport:{width:900,height:650}});
+ await page.addInitScript(s=>{if(!localStorage.getItem('portfolio.shikomi.workspace.v1'))localStorage.setItem('portfolio.shikomi.workspace.v1',JSON.stringify(s));},state);
+ await page.goto('http://127.0.0.1:'+server.address().port);
+ await page.getByRole('button',{name:'コース・料理の設定',exact:true}).click();await page.getByRole('button',{name:'コース',exact:true}).click();
+ const list=page.getByRole('region',{name:'3500円コースの料理一覧',exact:true});
+ for(const size of [{width:900,height:650},{width:1360,height:920}]){
+  await page.setViewportSize(size);await list.scrollIntoViewIfNeeded();
+  const before=await page.locator('.settings-body').evaluate(el=>el.scrollTop);
+  const dimensions=await list.evaluate(el=>({height:el.clientHeight,content:el.scrollHeight,overflow:getComputedStyle(el).overflowY}));
+  assert.ok(dimensions.content>dimensions.height);assert.ok(dimensions.height<=size.height*.34+2);assert.equal(dimensions.overflow,'auto');
+  await list.focus();await page.keyboard.press('End');await page.waitForFunction(()=>document.querySelector('.course-dish-list').scrollTop>0);
+  assert.equal(await page.locator('.settings-body').evaluate(el=>el.scrollTop),before);
+ }
+ const last=list.locator('.course-dish-config').filter({hasText:'検証料理60'});
+ await last.getByRole('checkbox').check();
+ await page.getByLabel('3500円コース・検証料理60の数量',{exact:true}).fill('3');
+ await last.scrollIntoViewIfNeeded();await page.screenshot({path:resolve(root,'course-scroll-v24.png')});
+ await page.getByRole('button',{name:'保存',exact:true}).click();
+ await page.waitForFunction(()=>JSON.parse(localStorage.getItem('portfolio.shikomi.workspace.v1')).settings.courses[0].recipe?.['scroll-60']?.quantity===3);
+ await page.reload();await page.getByRole('button',{name:'コース・料理の設定',exact:true}).click();await page.getByRole('button',{name:'コース',exact:true}).click();
+ assert.equal(await last.getByRole('checkbox').isChecked(),true);
+ assert.equal(await page.getByLabel('3500円コース・検証料理60の数量',{exact:true}).inputValue(),'3');
+ console.log('63 dishes scroll inside each course at 900x650 and 1360x920; keyboard scrolling preserves outer position; last dish selection and quantity persist after reload');await page.close();
+}finally{await browser?.close();await new Promise(r=>server.close(r));}
